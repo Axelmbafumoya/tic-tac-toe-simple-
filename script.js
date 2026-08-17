@@ -1,9 +1,13 @@
 const gameBoard = document.getElementById('game-board');
 const statusMessage = document.getElementById('status-message');
-let go = "circle"
 const resetButton = document.getElementById("reset-button");
+const winnigMessage = document.getElementById("winnigMessage");
+const endOfGameMessageOn = document.getElementById("endOfGameMessageOn");
+const endOfGameMessageTwo = document.getElementById("endOfGameMessageTwo");
+const endOfGameMessageTrois = document.getElementById("endOfGameMessageTrois");
+let go = "circle";
 
-const startCells = ["", "", "", "", "", "", "", "", ""]
+const startCells = ["", "", "", "", "", "", "", "", ""];
 
 statusMessage.textContent = "Player X's turn";
 
@@ -14,7 +18,7 @@ function createBoard() {
         const cellElement = document.createElement("div");
         cellElement.classList.add("square");
         cellElement.id = index;
-        cellElement.addEventListener("click", addGo)
+        cellElement.addEventListener("click", addGo);
         gameBoard.append(cellElement);
 
     })
@@ -25,15 +29,15 @@ createBoard()
 
 function addGo(e) {
 
-    console.log("click", e.target)
-    const goDisplay = document.createElement("div")
-    goDisplay.classList.add(go)
-    e.target.append(goDisplay)
+    console.log("click", e.target);
+    const goDisplay = document.createElement("div");
+    goDisplay.classList.add(go);
+    e.target.append(goDisplay);
     go = go === "circle" ? "cross" : "circle" // if egal the string of "circle" and that is true, it is going to change to be cross , otherwise circle
     statusMessage.textContent = "it is now " + go + "'s go"
-    e.target.removeEventListener("click", addGo) // when one box get clicked, it remove the addgo function to the clicked box
-    console.log(go)
-    checkScore()
+    e.target.removeEventListener("click", addGo) ;// when one box get clicked, it remove the addgo function to the clicked box
+    console.log(go);
+    checkScore();
 
 }
 
@@ -47,33 +51,76 @@ function checkScore() {
         [0, 4, 8], [2, 4, 6]
     ]
 
-    winningCombos.forEach(array => {
+  
+    const circleWins = winningCombos.some(array =>
+        array.every(cell =>
+            allSquares[cell].firstChild?.classList.contains("circle")
+        )
+    )
 
-        const circleWins = array.every(cell =>
-            allSquares[cell].firstChild?.classList.contains("circle"))
+    const crossWins = winningCombos.some(array =>
+        array.every(cell =>
+            allSquares[cell].firstChild?.classList.contains("cross")
+        )
+    )
 
-        if (circleWins) {
-            statusMessage.textContent = "circle wins !"
-            allSquares.forEach(square => square.replaceWith(square.cloneNode(true)))
-        }
+    const boardFull = [...allSquares].every(square =>
+        square.firstChild
+    )
 
-    })
+    if (circleWins) {
 
-    winningCombos.forEach(array => {
+        statusMessage.textContent = ""
+        endOfGameMessageOn.textContent = "Circle"
+        endOfGameMessageTrois.textContent = ""
+        endOfGameMessageTwo.textContent = " wins !"
 
-        const crossWins = array.every(cell =>
-            allSquares[cell].firstChild?.classList.contains("cross"))
-            
-        if (crossWins) {
-            statusMessage.textContent = "cross wins !"
-            allSquares.forEach(square => square.replaceWith(square.cloneNode(true)))
-        }
+        // Bloque les cases
+        allSquares.forEach(square =>
+            square.replaceWith(square.cloneNode(true))
+        )
 
-    })
+        winnigMessage.style.display = "block"
 
+        // Affiche Reset
+        resetButton.style.display = "block"
 
+    } else if (crossWins) {
 
+        statusMessage.textContent = ""
+        endOfGameMessageOn.textContent = ""
+        endOfGameMessageTrois.textContent = "Cross"
+        endOfGameMessageTwo.textContent = " wins !"
+
+        // Bloque les cases
+        allSquares.forEach(square =>
+            square.replaceWith(square.cloneNode(true))
+        )
+
+        winnigMessage.style.display = "block"
+
+        // Affiche Reset
+        resetButton.style.display = "block"
+
+    } else if (boardFull) {
+
+        statusMessage.textContent = ""
+        endOfGameMessageOn.textContent = ""
+        endOfGameMessageTrois.textContent = ""
+        endOfGameMessageTwo.textContent = "it's a draw !"
+
+        // Bloque les cases
+        allSquares.forEach(square =>
+            square.replaceWith(square.cloneNode(true))
+        )
+
+        winnigMessage.style.display = "block"
+
+        // Affiche Reset
+        resetButton.style.display = "block"
+    }
 }
+
 
 resetButton.addEventListener("click", resetGame);
 
@@ -81,6 +128,8 @@ function resetGame() {
     gameBoard.innerHTML = "";
     go = "circle";
     statusMessage.textContent = "Circle's turn";
+    resetButton.style.display = "none";
+    winnigMessage.style.display = "none"
     createBoard();
 }
 
